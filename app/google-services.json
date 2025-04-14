@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "190092702780",
+    "project_id": "cookit-893ad",
+    "storage_bucket": "cookit-893ad.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:190092702780:android:804f3e619b605fd60abf39",
+        "android_client_info": {
+          "package_name": "com.example.cocktails"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-W0DBAfQt930ED3pMRoZuoCZElBiSCRk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:190092702780:android:57ca7ae459a2baa00abf39",
+        "android_client_info": {
+          "package_name": "com.example.meals"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-W0DBAfQt930ED3pMRoZuoCZElBiSCRk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
