@@ -1,8 +1,10 @@
 package com.example.cocktails
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
@@ -13,7 +15,6 @@ class MealViewModel(application: Application) : AndroidViewModel(application) {
     private val _meals = MutableStateFlow<List<Meal>>(emptyList())
     val meals = _meals.asStateFlow()
 
-    // Room + API setup
     private val database = AppDatabase.getDatabase(application)
     private val mealDao = database.mealDao()
     private val retrofit = Retrofit.Builder()
@@ -22,7 +23,14 @@ class MealViewModel(application: Application) : AndroidViewModel(application) {
         .build()
     private val api = retrofit.create(MealApi::class.java)
 
-    val repository = MealRepository(mealDao, api) // <- Uwaga: udostępniamy repo do UI
+    val repository = MealRepository(mealDao, api)
+
+    val isLoggedIn: Boolean
+        get() = FirebaseAuth.getInstance().currentUser != null
+
+    fun getCurrentUserId(): String? {
+        return FirebaseAuth.getInstance().currentUser?.uid
+    }
 
     init {
         loadRandomMeals()
@@ -35,7 +43,7 @@ class MealViewModel(application: Application) : AndroidViewModel(application) {
                 try {
                     val response = api.getRandomMeal()
                     response.meals.firstOrNull()?.let {
-                        randoms.add(it)
+                        randoms.add(it.toMeal())
                     }
                 } catch (e: Exception) {
                     println("Błąd API: ${e.message}")
@@ -49,7 +57,7 @@ class MealViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 val response = api.searchMeals(query)
-                _meals.value = response.meals ?: emptyList()
+                _meals.value = response.meals?.map { it.toMeal() } ?: emptyList()
             } catch (_: Exception) {
                 _meals.value = emptyList()
             }
@@ -57,42 +65,62 @@ class MealViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun toggleFavorite(meal: Meal) {
+        if (!isLoggedIn) {
+            Log.d("MealViewModel", "Użytkownik niezalogowany – nie można dodać do ulubionych")
+            return
+        }
+
         viewModelScope.launch {
-            val existing = repository.getMealById(meal.idMeal)
-            val isNowFavorite = !(existing?.isFavorite ?: false)
-            repository.setFavorite(meal.idMeal, isNowFavorite)
+            val uid = getCurrentUserId()
+            if (uid == null) return@launch
+            val existing = repository.getMealById(meal.idMeal, uid)
+
             if (existing == null) {
-                repository.saveMealOffline(meal, favorite = true)
+                repository.saveMealOffline(meal, favorite = true, userId = uid)
+            } else {
+                val isNowFavorite = !existing.isFavorite
+                repository.setFavorite(meal.idMeal, isNowFavorite, uid)
             }
         }
     }
 
     fun saveOffline(meal: Meal) {
+        if (!isLoggedIn) {
+            Log.d("MealViewModel", "Użytkownik niezalogowany – nie można zapisać offline")
+            return
+        }
+
         viewModelScope.launch {
-            val existing = repository.getMealById(meal.idMeal)
-            if (existing == null) {
-                repository.saveMealOffline(meal)
-            } else {
-                repository.setOffline(meal.idMeal, true)
+            val uid = getCurrentUserId()
+            if (uid != null) {
+                val existing = repository.getMealById(meal.idMeal, uid)
+                if (existing == null) {
+                    repository.saveMealOffline(meal, userId = uid)
+                } else {
+                    repository.setOffline(meal.idMeal, true, uid)
+                }
             }
         }
     }
 
     fun removeOffline(mealId: String) {
         viewModelScope.launch {
-            repository.setOffline(mealId, false)
+            val uid = getCurrentUserId()
+            if (uid != null) {
+                repository.setOffline(mealId, false, uid)
+            }
         }
     }
 
     fun getFavoriteMeals(onResult: (List<MealEntity>) -> Unit) {
         viewModelScope.launch {
-            onResult(repository.getFavoriteMeals())
+            getCurrentUserId()?.let { repository.getFavoriteMeals(it) }?.let { onResult(it) }
         }
     }
 
     fun getOfflineMeals(onResult: (List<MealEntity>) -> Unit) {
         viewModelScope.launch {
-            onResult(repository.getOfflineMeals())
+            getCurrentUserId()?.let { repository.getOfflineMeals(it) }?.let { onResult(it) }
         }
     }
 }

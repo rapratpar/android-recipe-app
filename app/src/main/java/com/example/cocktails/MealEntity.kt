@@ -8,7 +8,9 @@ data class MealEntity(
     @PrimaryKey val id: String,
     val name: String,
     val thumbnail: String,
-    val instructions: String,
+    val instructions: String?,
     val isFavorite: Boolean = false,
-    val isOffline: Boolean = false
+    val isOffline: Boolean = false,
+    val userId: String = "",
+    val ingredients: List<Pair<String, String>> = emptyList() // ← nowość
 )

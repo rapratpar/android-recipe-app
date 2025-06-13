@@ -11,6 +11,18 @@ class AuthViewModel : ViewModel() {
     val showSnackbar = mutableStateOf(false)
 
     fun login(email: String, password: String, onSuccess: () -> Unit) {
+        if (email.isBlank() || password.isBlank()) {
+            loginMessage.value = "Email i hasło nie mogą być puste"
+            showSnackbar.value = true
+            return
+        }
+
+        if (password.length < 6) {
+            loginMessage.value = "Hasło musi mieć co najmniej 6 znaków"
+            showSnackbar.value = true
+            return
+        }
+
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -25,6 +37,18 @@ class AuthViewModel : ViewModel() {
     }
 
     fun register(email: String, password: String, onSuccess: () -> Unit) {
+        if (email.isBlank() || password.isBlank()) {
+            loginMessage.value = "Email i hasło nie mogą być puste"
+            showSnackbar.value = true
+            return
+        }
+
+        if (password.length < 6) {
+            loginMessage.value = "Hasło musi mieć co najmniej 6 znaków"
+            showSnackbar.value = true
+            return
+        }
+
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {

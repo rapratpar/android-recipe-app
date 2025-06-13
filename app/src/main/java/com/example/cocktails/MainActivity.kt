@@ -11,7 +11,6 @@ import com.google.firebase.FirebaseApp
 
 class MainActivity : ComponentActivity() {
 
-    // <- tutaj tworzysz ViewModel z factory!
     private val viewModel: MealViewModel by viewModels {
         MealViewModelFactory(application)
     }
@@ -23,7 +22,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
                 Surface(color = MaterialTheme.colorScheme.background) {
-                    App(viewModel) // <- przekazujesz ViewModel do całej aplikacj
+                    App(viewModel)
             }
         }
     }

@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.outlined.Save
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -26,7 +27,9 @@ fun AuthScreen(navController: NavController, viewModel: AuthViewModel = viewMode
     val message = viewModel.loginMessage.value
     val showSnackbar = viewModel.showSnackbar
 
-    // Pokazywanie Snackbara przy zmianie komunikatu
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
     LaunchedEffect(showSnackbar.value) {
         if (showSnackbar.value && message != null) {
             snackbarHostState.showSnackbar(message)
@@ -37,48 +40,78 @@ fun AuthScreen(navController: NavController, viewModel: AuthViewModel = viewMode
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
-        var email by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
-        var isLogin by remember { mutableStateOf(true) }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(0.85f)
+                    .wrapContentHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    "Zaloguj się",
+                    style = MaterialTheme.typography.h5,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
 
-        Column(modifier = Modifier.padding(padding).padding(16.dp)) {
-            Text(text = if (isLogin) "Logowanie" else "Rejestracja")
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = MaterialTheme.colors.primary,
+                        focusedLabelColor = MaterialTheme.colors.primary
+                    )
+                )
 
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") }
-            )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Hasło") },
-                visualTransformation = PasswordVisualTransformation()
-            )
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Hasło") },
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation(),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = MaterialTheme.colors.primary,
+                        focusedLabelColor = MaterialTheme.colors.primary
+                    )
+                )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-            Button(onClick = {
-                if (isLogin) {
-                    viewModel.login(email, password) {
-                        navController.navigate("main?message=Udało się zalogować!") {
-                            popUpTo("auth") { inclusive = true }
+                Button(
+                    onClick = {
+                        viewModel.login(email, password) {
+                            navController.navigate("main") {
+                                popUpTo("auth") { inclusive = true }
+                            }
                         }
-                    }
-                } else {
-                    viewModel.register(email, password) {
-                        navController.navigate("main?message=Rejestracja zakończona sukcesem!") {
-                            popUpTo("auth") { inclusive = true }
-                        }
-                    }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Zaloguj się")
                 }
-            }) {
-                Text(text = if (isLogin) "Zaloguj się" else "Zarejestruj się")
-            }
 
-            TextButton(onClick = { isLogin = !isLogin }) {
-                Text(if (isLogin) "Nie masz konta? Zarejestruj się" else "Masz już konto? Zaloguj się")
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedButton(
+                    onClick = {
+                        viewModel.register(email, password) {
+                            navController.navigate("main") {
+                                popUpTo("auth") { inclusive = true }
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Zarejestruj się")
+                }
             }
         }
     }

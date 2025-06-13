@@ -48,8 +48,7 @@ dependencies {
     implementation("androidx.compose.material:material:1.3.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.5.1")
     implementation("androidx.navigation:navigation-compose:2.5.3")
-    implementation("androidx.room:room-runtime:2.4.3")
-    kapt("androidx.room:room-compiler:2.4.3")
+
     implementation("androidx.compose.ui:ui:1.3.0")
     implementation("androidx.compose.material:material:1.3.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.5.1")
@@ -59,7 +58,6 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    kapt("androidx.room:room-compiler:2.6.1") // KAPT dla Room
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -76,6 +74,11 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+
     implementation("androidx.navigation:navigation-compose:2.7.1")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
@@ -89,7 +92,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0-rc03")
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("javax.inject:javax.inject:1")
-    implementation("androidx.room:room-ktx:2.4.3")
     implementation("androidx.compose.material:material-icons-extended:1.7.7")
 
     implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
